@@ -1,4 +1,4 @@
-# Next-Tailwind Starter Template
+# Next-Tailwind-with-Connect-Wallet Starter Template
 
 <p align="center">
   <img src="https://res.cloudinary.com/practicaldev/image/fetch/s--9bipHLLn--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/wwy6cp17cco1zk8wn0kb.jpeg" alt="twin, next, styled-components" width="500">
@@ -9,9 +9,13 @@
 Run the following command to bootstrap your next-app using this template:
 
 ```
-yarn create next-app [project-name] -e https://github.com/nelwincatalogo/next-tailwind
-# or
-npx create-next-app [project-name] -e https://github.com/nelwincatalogo/next-tailwind
+yarn create next-app [project-name] -e https://github.com/nelwincatalogo/next-tailwind-with-connect-wallet
+```
+
+OR
+
+```
+npx create-next-app [project-name] -e https://github.com/nelwincatalogo/next-tailwind-with-connect-wallet
 ```
 
 ## Summary

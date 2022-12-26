@@ -1,9 +1,12 @@
 import type { NextPage } from 'next';
 import { useAlert } from 'react-alert';
 import Head from 'next/head';
+import { ConnectKitButton } from 'connectkit';
+import { useAccount } from 'wagmi';
 
 const Home: NextPage = () => {
   const alert = useAlert();
+  const { address, isConnecting, isDisconnected, status } = useAccount();
 
   return (
     <div className="font-inter">
@@ -14,8 +17,13 @@ const Home: NextPage = () => {
       </Head>
 
       <main>
-        <div className="text-red-500 font-bold">Hello World</div>
-        <button
+        <ConnectKitButton />
+
+        <div>Status:</div>
+        <div className="text-red-500">{status}</div>
+        {address && <div>Connected Wallet: {address}</div>}
+
+        {/* <button
           onClick={() => {
             alert.success('Yeyyy!');
             alert.error('Yeyyy!');
@@ -23,7 +31,7 @@ const Home: NextPage = () => {
           }}
         >
           Alert
-        </button>
+        </button> */}
       </main>
     </div>
   );

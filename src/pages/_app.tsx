@@ -1,12 +1,12 @@
 import type { AppProps } from 'next/app';
 import { transitions, positions, Provider as AlertProvider } from 'react-alert';
 
-import { WagmiConfig, createClient, configureChains, mainnet } from 'wagmi';
+import { WagmiConfig, createClient, configureChains } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { ConnectKitProvider } from 'connectkit';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-import { bscTestnet } from 'wagmi/chains';
+import { bscTestnet, bsc } from 'wagmi/chains';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
 import { LedgerConnector } from 'wagmi/connectors/ledger';
@@ -24,7 +24,7 @@ const options = {
 };
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [bscTestnet],
+  [bscTestnet, bsc],
   [publicProvider()]
 );
 
@@ -48,7 +48,9 @@ const client = createClient({
     new WalletConnectConnector({
       chains,
       options: {
-        qrcode: false,
+        qrcode: true,
+        version: '2',
+        projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
       },
     }),
   ],

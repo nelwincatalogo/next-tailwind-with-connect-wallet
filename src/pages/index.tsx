@@ -6,7 +6,7 @@ import { useAccount } from 'wagmi';
 
 const Home: NextPage = () => {
   const alert = useAlert();
-  const { address, isConnecting, isDisconnected, status } = useAccount();
+  const { address, status } = useAccount();
 
   return (
     <div className="font-inter">

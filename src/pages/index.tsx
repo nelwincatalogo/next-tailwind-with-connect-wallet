@@ -17,21 +17,15 @@ const Home: NextPage = () => {
       </Head>
 
       <main>
-        <ConnectKitButton />
+        <div className="flex flex-col items-center gap-4 py-8">
+          <ConnectKitButton />
 
-        <div>Status:</div>
-        <div className="text-red-500">{status}</div>
-        {address && <div>Connected Wallet: {address}</div>}
-
-        {/* <button
-          onClick={() => {
-            alert.success('Yeyyy!');
-            alert.error('Yeyyy!');
-            alert.info('Yeyyy!');
-          }}
-        >
-          Alert
-        </button> */}
+          <div className="text-center">
+            <div>Status:</div>
+            <div className="text-red-500">{status}</div>
+            {address && <div>{address}</div>}
+          </div>
+        </div>
       </main>
     </div>
   );

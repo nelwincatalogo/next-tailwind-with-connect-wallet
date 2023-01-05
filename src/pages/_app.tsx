@@ -24,7 +24,7 @@ const options = {
 };
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [bscTestnet, bsc],
+  [bscTestnet],
   [publicProvider()]
 );
 

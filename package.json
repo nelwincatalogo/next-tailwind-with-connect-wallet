@@ -12,6 +12,8 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@hookstate/core": "^4.0.0",
+    "@hookstate/devtools": "^4.0.0",
     "axios": "^1.2.2",
     "connectkit": "^1.1.1",
     "ethers": "^5.7.2",
@@ -20,7 +22,7 @@
     "react-alert": "^7.0.3",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
-    "wagmi": "^0.10.4"
+    "wagmi": "^0.10.5"
   },
   "devDependencies": {
     "@types/node": "18.11.18",

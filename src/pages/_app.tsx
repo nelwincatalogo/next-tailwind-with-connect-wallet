@@ -1,18 +1,10 @@
 import type { AppProps } from 'next/app';
 import { transitions, positions, Provider as AlertProvider } from 'react-alert';
 
-import { WagmiConfig, createClient, configureChains } from 'wagmi';
-import { publicProvider } from 'wagmi/providers/public';
-import { ConnectKitProvider } from 'connectkit';
-import { InjectedConnector } from 'wagmi/connectors/injected';
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect';
-import { bscTestnet, bsc } from 'wagmi/chains';
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
-import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
-import { LedgerConnector } from 'wagmi/connectors/ledger';
-
+import WalletProvider from '@/app/wallet';
 import AlertTemplate from '@/components/layout/AlertTemplate';
 import '@/styles/globals.css';
+import { useEffect, useState } from 'react';
 
 const options = {
   // you can also just use 'bottom center'
@@ -23,50 +15,34 @@ const options = {
   transition: transitions.SCALE,
 };
 
-const { chains, provider, webSocketProvider } = configureChains(
-  [bscTestnet],
-  [publicProvider()]
-);
-
-const client = createClient({
-  connectors: [
-    new InjectedConnector({
-      chains,
-    }),
-    new MetaMaskConnector({
-      chains,
-    }),
-    new CoinbaseWalletConnector({
-      chains,
-      options: {
-        appName: 'wagmi.sh',
-      },
-    }),
-    new LedgerConnector({
-      chains,
-    }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        qrcode: true,
-        version: '2',
-        projectId: process.env.NEXT_PUBLIC_PROJECT_ID,
-      },
-    }),
-  ],
-  provider,
-  webSocketProvider,
-});
+declare global {
+  interface Window {
+    grecaptcha: any;
+    dataLayer: any;
+  }
+}
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
+
+  useEffect(() => {
+    if (recaptchaLoaded) return;
+    const handleLoaded = (_) => {
+      window.grecaptcha.ready();
+    };
+    const script = document.createElement('script');
+    script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`;
+    document.body.appendChild(script);
+    script.addEventListener('load', handleLoaded);
+    setRecaptchaLoaded(true);
+  }, [recaptchaLoaded]);
+
   return (
-    <WagmiConfig client={client}>
-      <ConnectKitProvider>
-        <AlertProvider template={AlertTemplate} {...options}>
-          <Component {...pageProps} />
-        </AlertProvider>
-      </ConnectKitProvider>
-    </WagmiConfig>
+    <AlertProvider template={AlertTemplate} {...options}>
+      <WalletProvider>
+        <Component {...pageProps} />
+      </WalletProvider>
+    </AlertProvider>
   );
 }
 

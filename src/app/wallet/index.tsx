@@ -8,7 +8,7 @@ import { ConnectKitProvider } from 'connectkit';
 import { InjectedConnector } from '@wagmi/core/connectors/injected';
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask';
 import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect';
-import { disconnect, watchAccount } from '@wagmi/core';
+import { disconnect, watchAccount, signMessage } from '@wagmi/core';
 
 import axios, { BLOCKCHAIN } from '@/app/api';
 import config from '../config';
@@ -52,12 +52,74 @@ export function WalletProvider({ children }) {
   const onLoad = async () => {};
 
   // onWalletConnected Listener
-  const onWalletConnected = async () => {};
+  const onWalletConnected = async () => {
+    if (!gState['wallet']['address'].value) {
+      console.warn('Wallet not Connected!');
+      return;
+    }
+
+    await grecaptcha();
+  };
+
+  // onVerified Listener
+  const onVerified = async () => {};
 
   // Disconnect OR onDisconnect Listener
   const Disconnect = async () => {
     await disconnect();
     gState['wallet'].set({});
+    gState['verify'].set(null);
+  };
+
+  /**
+   * WARNING: Don't mess with what's below unless you know what you are doing!
+   */
+
+  const grecaptcha = async () => {
+    if (window.grecaptcha) {
+      try {
+        window.grecaptcha.ready((_) => executeGrecapcha('crypto_sheesh_login'));
+      } catch (error) {
+        console.error('grecaptcha: ', error);
+      }
+    }
+  };
+
+  const executeGrecapcha = async (action) => {
+    try {
+      // execute grecapcha
+      const _gToken = await window.grecaptcha.execute(
+        process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY,
+        { action }
+      );
+
+      // request metamask for signing
+      const _metamaskReq = await axios
+        .post('/metamask/request', {
+          address: gState['wallet']['address'].value,
+          'g-recaptcha-response': _gToken,
+        })
+        .then((res) => res.data);
+
+      alert.info(_metamaskReq.message);
+      const signature = await signMessage({
+        message: _metamaskReq.data,
+      });
+
+      // verify signed token
+      const verify = await axios
+        .post('/metamask/verify', {
+          address: gState['wallet']['address'].value,
+          signature,
+        })
+        .then((res) => res.data);
+
+      alert.success(verify.message);
+      localStorage.setItem('token', verify.token);
+      gState['verify'].set(verify);
+    } catch (error) {
+      console.warn('executeGrecapcha: ', error);
+    }
   };
 
   // onAccountChange
@@ -89,6 +151,12 @@ export function WalletProvider({ children }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (gState['verify'].value) {
+      onVerified();
+    }
+  }, [gState['verify']]);
+
   return (
     <WalletContext.Provider
       value={{
@@ -98,9 +166,9 @@ export function WalletProvider({ children }) {
         isConnecting,
         isDisconnected,
         status,
-        Disconnect,
         onLoad,
         onWalletConnected,
+        Disconnect,
       }}
     >
       <WagmiConfig client={client}>

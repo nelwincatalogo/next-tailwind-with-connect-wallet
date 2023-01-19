@@ -4,6 +4,7 @@ import { devtools } from '@hookstate/devtools';
 export const globalState = hookstate(
   {
     wallet: {},
+    verify: null,
   },
   devtools({ key: 'globalState' })
 );

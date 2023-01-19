@@ -48,14 +48,20 @@ export function WalletProvider({ children }) {
   const { address, isConnected, isConnecting, isDisconnected, status } =
     useAccount();
 
-  // Disconnect
+  // onLoad
+  const onLoad = async () => {};
+
+  // onWalletConnected Listener
+  const onWalletConnected = async () => {};
+
+  // Disconnect OR onDisconnect Listener
   const Disconnect = async () => {
     await disconnect();
     gState['wallet'].set({});
   };
 
   // onAccountChange
-  const onAccountChange = (account) => {
+  const onAccountChange = async (account) => {
     if (gState['wallet']['address'].value) {
       if (gState['wallet']['address'].value !== account.address) {
         // account has changed
@@ -70,12 +76,13 @@ export function WalletProvider({ children }) {
         isDisconnected: account.isDisconnected,
         status: account.status,
       });
+      await onWalletConnected();
     }
   };
 
-  // onLoad
   useEffect(() => {
     const unwatch = watchAccount(onAccountChange);
+    onLoad();
 
     return () => {
       unwatch();
@@ -92,6 +99,8 @@ export function WalletProvider({ children }) {
         isDisconnected,
         status,
         Disconnect,
+        onLoad,
+        onWalletConnected,
       }}
     >
       <WagmiConfig client={client}>

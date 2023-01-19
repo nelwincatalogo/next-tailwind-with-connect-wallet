@@ -8,7 +8,14 @@ import { ConnectKitProvider } from 'connectkit';
 import { InjectedConnector } from '@wagmi/core/connectors/injected';
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask';
 import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect';
-import { disconnect, watchAccount, signMessage } from '@wagmi/core';
+import {
+  disconnect,
+  watchAccount,
+  signMessage,
+  readContract,
+  prepareWriteContract,
+  writeContract,
+} from '@wagmi/core';
 
 import axios, { BLOCKCHAIN } from '@/app/api';
 import config from '../config';
@@ -194,6 +201,9 @@ export function WalletProvider({ children }) {
         onLoad,
         onWalletConnected,
         Disconnect,
+        readContract,
+        prepareWriteContract,
+        writeContract,
       }}
     >
       <WagmiConfig client={client}>

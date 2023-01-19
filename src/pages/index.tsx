@@ -1,10 +1,79 @@
+import { useGlobalState } from '@/app/store';
 import { useWalletContext } from '@/app/wallet';
+import { useHookstate } from '@hookstate/core';
 import { ConnectKitButton } from 'connectkit';
 import type { NextPage } from 'next';
 import Head from 'next/head';
+import { useEffect } from 'react';
 
 const Home: NextPage = () => {
-  const { status, address, Disconnect } = useWalletContext();
+  const gState = useGlobalState();
+  const {
+    alert,
+    status,
+    address,
+    Disconnect,
+    readContract,
+    prepareWriteContract,
+    writeContract,
+    isDisconnected,
+  } = useWalletContext();
+  const balance = useHookstate(0);
+  const recipient = useHookstate('');
+  const amount = useHookstate(0);
+
+  const getBusdBal = async () => {
+    const data = await readContract({
+      ...gState['contracts']['busd'].value,
+      functionName: 'balanceOf',
+      args: [gState['wallet']['address'].value],
+    });
+
+    const bal = await toBUSD(data.toString());
+    balance.set(bal);
+    alert.success(`Balance: ${bal}`);
+  };
+
+  const sendBusd = async () => {
+    try {
+      const _amount = await toRawBUSD(amount.value);
+      const config = await prepareWriteContract({
+        ...gState['contracts']['busd'].value,
+        functionName: 'transfer',
+        args: [recipient.value, _amount],
+      });
+      const data = await writeContract(config);
+
+      console.log('TEST: ', data);
+      alert.success('SENT SUCCESS');
+    } catch (error) {
+      alert.error(error.message);
+    } finally {
+      getBusdBal();
+    }
+  };
+
+  const toBUSD = async (price) => {
+    const usdtDecimal = await readContract({
+      ...gState['contracts']['busd'].value,
+      functionName: 'decimals',
+    });
+    return Number(price) / 10 ** Number(usdtDecimal);
+  };
+
+  const toRawBUSD = async (price) => {
+    const usdtDecimal = await readContract({
+      ...gState['contracts']['busd'].value,
+      functionName: 'decimals',
+    });
+    return Number(price) * 10 ** Number(usdtDecimal);
+  };
+
+  useEffect(() => {
+    if (isDisconnected) {
+      balance.set(0);
+    }
+  }, [isDisconnected]);
 
   return (
     <div className="font-inter">
@@ -45,6 +114,43 @@ const Home: NextPage = () => {
             <div className="text-red-500">{status}</div>
             {address && <div>{address}</div>}
           </div>
+
+          {address && (
+            <div className="space-y-8 pt-6">
+              <div className="flex flex-col items-center">
+                <button
+                  onClick={getBusdBal}
+                  className="py-2 px-6 bg-green-500 text-white rounded-lg hover:bg-green-600 active:scale-95"
+                >
+                  GET BUSD BALANCE
+                </button>
+                <div>{`BUSD Balance: ${balance.value.toLocaleString()}`}</div>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                <input
+                  className="border px-4 py-1"
+                  type="text"
+                  value={recipient.value}
+                  onChange={(e) => recipient.set(e.target.value)}
+                  placeholder="Recipient Address"
+                />
+                <input
+                  className="border px-4 py-1"
+                  type="number"
+                  value={amount.value}
+                  onChange={(e) => amount.set(Number(e.target.value))}
+                  placeholder="Amount"
+                />
+                <button
+                  onClick={sendBusd}
+                  className="py-2 px-6 bg-green-500 text-white rounded-lg hover:bg-green-600 active:scale-95"
+                >
+                  SEND
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>

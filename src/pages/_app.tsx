@@ -1,10 +1,10 @@
 import type { AppProps } from 'next/app';
 import { transitions, positions, Provider as AlertProvider } from 'react-alert';
 
-import WalletProvider from '@/app/wallet';
 import AlertTemplate from '@/components/layout/AlertTemplate';
 import '@/styles/globals.css';
 import { useEffect, useState } from 'react';
+import { WalletProvider } from '@/app/wallet';
 
 const options = {
   // you can also just use 'bottom center'

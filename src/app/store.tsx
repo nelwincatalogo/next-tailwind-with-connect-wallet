@@ -1,10 +1,9 @@
 import { hookstate, useHookstate } from '@hookstate/core';
 import { devtools } from '@hookstate/devtools';
 
-const globalState = hookstate(
+export const globalState = hookstate(
   {
-    test: 0,
-    web3: null,
+    wallet: {},
   },
   devtools({ key: 'globalState' })
 );

@@ -1,6 +1,8 @@
 import axios from 'axios';
 import CONFIG from '@/app/config';
 
+export const BLOCKCHAIN = '/blockchain';
+
 const instance = axios.create({
   baseURL: CONFIG.setting.api_url,
   headers: {

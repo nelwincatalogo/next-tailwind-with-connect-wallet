@@ -22,7 +22,7 @@
     "react-alert": "^7.0.3",
     "react-dom": "^18.2.0",
     "react-icons": "^4.7.1",
-    "wagmi": "^0.10.5"
+    "wagmi": "^0.10.11"
   },
   "devDependencies": {
     "@types/node": "18.11.18",

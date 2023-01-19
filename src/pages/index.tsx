@@ -1,11 +1,10 @@
+import { useWalletContext } from '@/app/wallet';
+import { ConnectKitButton } from 'connectkit';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { ConnectKitButton } from 'connectkit';
-import { useWalletContext } from '@/app/wallet';
-import { useDisconnect } from 'wagmi';
 
 const Home: NextPage = () => {
-  const { address, status, Disconnect } = useWalletContext();
+  const { status, address, Disconnect } = useWalletContext();
 
   return (
     <div className="font-inter">
@@ -15,20 +14,12 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
+      <main className="bg-white min-h-screen">
         <div className="flex flex-col items-center gap-4 py-8">
           <div className="flex items-center gap-4">
             <ConnectKitButton />
             <ConnectKitButton.Custom>
-              {({
-                isConnected,
-                isConnecting,
-                show,
-                hide,
-                address,
-                ensName,
-                truncatedAddress,
-              }) => {
+              {({ show, isConnected, truncatedAddress }) => {
                 return (
                   <button
                     onClick={show}
@@ -42,7 +33,7 @@ const Home: NextPage = () => {
             {address && (
               <button
                 onClick={() => Disconnect()}
-                className="py-2 px-6 bg-green-500 text-white rounded-lg hover:bg-green-600 active:scale-95"
+                className="py-2 px-6 bg-red-500 text-white rounded-lg hover:bg-red-600 active:scale-95"
               >
                 Disconnect
               </button>

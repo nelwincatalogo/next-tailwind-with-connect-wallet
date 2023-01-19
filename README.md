@@ -25,6 +25,13 @@ npx create-next-app [project-name] -e https://github.com/nelwincatalogo/next-tai
 - [Absolute Import](https://nextjs.org/docs/advanced-features/module-path-aliases)
 - [React Alert](https://www.npmjs.com/package/react-alert)
 - [React Icons](https://react-icons.github.io/react-icons/search)
+- [State Management (HookState)](https://hookstate.js.org/)
+- Default Font [Poppins, Inter]
+- TypeScript Support
+- Logs Remover on Production Build
+- Connect Wallet
+  - [ConnectKit](https://github.com/family/connectkit)
+  - [Wagmi](https://wagmi.sh/react/getting-started)
 - Linting
   - eslint
   - prettier
@@ -33,6 +40,3 @@ npx create-next-app [project-name] -e https://github.com/nelwincatalogo/next-tai
 - Lint on pre-commit
   - Husky
   - pretty-quick
-- Default Font ( Poppins )
-- TypeScript Support
-- Logs Remover on Production Build

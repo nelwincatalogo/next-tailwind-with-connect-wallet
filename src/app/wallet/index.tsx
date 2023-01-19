@@ -8,7 +8,7 @@ import { ConnectKitProvider } from 'connectkit';
 import { InjectedConnector } from '@wagmi/core/connectors/injected';
 import { MetaMaskConnector } from '@wagmi/core/connectors/metaMask';
 import { WalletConnectConnector } from '@wagmi/core/connectors/walletConnect';
-import { disconnect } from '@wagmi/core';
+import { disconnect, watchAccount } from '@wagmi/core';
 
 import axios, { BLOCKCHAIN } from '@/app/api';
 import config from '../config';
@@ -45,11 +45,42 @@ export const useWalletContext = () => useContext(WalletContext);
 export function WalletProvider({ children }) {
   const alert = useAlert();
   const gState = useGlobalState();
-  const { address, isConnected, isConnecting, status } = useAccount();
+  const { address, isConnected, isConnecting, isDisconnected, status } =
+    useAccount();
 
+  // Disconnect
   const Disconnect = async () => {
     await disconnect();
+    gState['wallet'].set({});
   };
+
+  // onAccountChange
+  const onAccountChange = (account) => {
+    if (gState['wallet']['address'].value) {
+      if (gState['wallet']['address'].value !== account.address) {
+        // account has changed
+        console.log('onChangeAccount: ', account);
+        Disconnect();
+      }
+    } else {
+      gState['wallet'].set({
+        address: account.address,
+        isConnected: account.isConnected,
+        isConnecting: account.isConnecting,
+        isDisconnected: account.isDisconnected,
+        status: account.status,
+      });
+    }
+  };
+
+  // onLoad
+  useEffect(() => {
+    const unwatch = watchAccount(onAccountChange);
+
+    return () => {
+      unwatch();
+    };
+  }, []);
 
   return (
     <WalletContext.Provider
@@ -58,6 +89,7 @@ export function WalletProvider({ children }) {
         address,
         isConnected,
         isConnecting,
+        isDisconnected,
         status,
         Disconnect,
       }}

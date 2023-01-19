@@ -49,7 +49,9 @@ export function WalletProvider({ children }) {
     useAccount();
 
   // onLoad
-  const onLoad = async () => {};
+  const onLoad = async () => {
+    await initContract();
+  };
 
   // onWalletConnected Listener
   const onWalletConnected = async () => {
@@ -69,6 +71,29 @@ export function WalletProvider({ children }) {
     await disconnect();
     gState['wallet'].set({});
     gState['verify'].set(null);
+  };
+
+  // loadContract
+  const initContract = async () => {
+    try {
+      const blockchainData = await axios
+        .get(BLOCKCHAIN)
+        .then((res) => res.data.data);
+      gState['blockchain'].set(blockchainData);
+
+      const nft = {
+        address: blockchainData.config.nft_address,
+        abi: blockchainData.config.nft_abi,
+      };
+      const busd = {
+        address: blockchainData.config.busd_address,
+        abi: blockchainData.config.busd_abi,
+      };
+
+      gState['contracts'].set({ nft, busd });
+    } catch (error) {
+      console.error('initContract: ', error);
+    }
   };
 
   /**

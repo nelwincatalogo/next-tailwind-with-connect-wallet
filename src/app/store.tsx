@@ -5,6 +5,8 @@ export const globalState = hookstate(
   {
     wallet: {},
     verify: null,
+    blockchain: null,
+    contracts: {},
   },
   devtools({ key: 'globalState' })
 );

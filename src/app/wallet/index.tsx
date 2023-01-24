@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { useAlert } from 'react-alert';
 
 import { configureChains, mainnet } from '@wagmi/core';
@@ -13,8 +13,8 @@ import {
   watchAccount,
   signMessage,
   readContract,
-  prepareWriteContract,
-  writeContract,
+  getContract,
+  getProvider,
 } from '@wagmi/core';
 
 import axios, { BLOCKCHAIN } from '@/app/api';
@@ -54,10 +54,12 @@ export function WalletProvider({ children }) {
   const gState = useGlobalState();
   const { address, isConnected, isConnecting, isDisconnected, status } =
     useAccount();
+  const [ctxContract, setCtxContract] = useState(null);
 
   // onLoad
   const onLoad = async () => {
-    await initContract();
+    await fetchBlockchain();
+    await loadContract();
   };
 
   // onWalletConnected Listener
@@ -71,7 +73,9 @@ export function WalletProvider({ children }) {
   };
 
   // onVerified Listener
-  const onVerified = async () => {};
+  const onVerified = async () => {
+    await loadContract();
+  };
 
   // Disconnect OR onDisconnect Listener
   const Disconnect = async () => {
@@ -80,8 +84,8 @@ export function WalletProvider({ children }) {
     gState['verify'].set(null);
   };
 
-  // loadContract
-  const initContract = async () => {
+  // fetchBlockchain
+  const fetchBlockchain = async () => {
     try {
       const blockchainData = await axios
         .get(BLOCKCHAIN)
@@ -99,7 +103,30 @@ export function WalletProvider({ children }) {
 
       gState['contracts'].set({ nft, busd });
     } catch (error) {
-      console.error('initContract: ', error);
+      console.error('fetchBlockchain: ', error);
+    }
+  };
+
+  // loadContract
+  const loadContract = async () => {
+    try {
+      const provider = getProvider();
+
+      const nft = getContract({
+        ...gState.contracts['nft'].value,
+        signerOrProvider: provider,
+      });
+      const busd = getContract({
+        ...gState.contracts['busd'].value,
+        signerOrProvider: provider,
+      });
+
+      setCtxContract({
+        nft,
+        busd,
+      });
+    } catch (error) {
+      console.error('loadContract: ', error);
     }
   };
 
@@ -175,8 +202,8 @@ export function WalletProvider({ children }) {
   };
 
   useEffect(() => {
-    const unwatch = watchAccount(onAccountChange);
     onLoad();
+    const unwatch = watchAccount(onAccountChange);
 
     return () => {
       unwatch();
@@ -198,12 +225,10 @@ export function WalletProvider({ children }) {
         isConnecting,
         isDisconnected,
         status,
+        ctxContract,
         onLoad,
         onWalletConnected,
         Disconnect,
-        readContract,
-        prepareWriteContract,
-        writeContract,
       }}
     >
       <WagmiConfig client={client}>

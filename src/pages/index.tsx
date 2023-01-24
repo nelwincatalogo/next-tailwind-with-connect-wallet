@@ -8,26 +8,17 @@ import { useEffect } from 'react';
 
 const Home: NextPage = () => {
   const gState = useGlobalState();
-  const {
-    alert,
-    status,
-    address,
-    Disconnect,
-    readContract,
-    prepareWriteContract,
-    writeContract,
-    isDisconnected,
-  } = useWalletContext();
+  const { alert, status, address, Disconnect, isDisconnected, ctxContract } =
+    useWalletContext();
   const balance = useHookstate(0);
   const recipient = useHookstate('');
   const amount = useHookstate(0);
 
   const getBusdBal = async () => {
-    const data = await readContract({
-      ...gState['contracts']['busd'].value,
-      functionName: 'balanceOf',
-      args: [gState['wallet']['address'].value],
-    });
+    const data = await ctxContract.busd.balanceOf(
+      gState['wallet']['address'].value ||
+        '0x07E2403ad511FA85A388AeB300d47657D2ae292d'
+    );
 
     const bal = await toBUSD(data.toString());
     balance.set(bal);
@@ -37,12 +28,7 @@ const Home: NextPage = () => {
   const sendBusd = async () => {
     try {
       const _amount = await toRawBUSD(amount.value);
-      const config = await prepareWriteContract({
-        ...gState['contracts']['busd'].value,
-        functionName: 'transfer',
-        args: [recipient.value, _amount],
-      });
-      const data = await writeContract(config);
+      const data = await ctxContract.busd.transfer(recipient.value, _amount);
 
       console.log('TEST: ', data);
       alert.success('SENT SUCCESS');
@@ -54,18 +40,12 @@ const Home: NextPage = () => {
   };
 
   const toBUSD = async (price) => {
-    const usdtDecimal = await readContract({
-      ...gState['contracts']['busd'].value,
-      functionName: 'decimals',
-    });
+    const usdtDecimal = await ctxContract.busd.decimals();
     return Number(price) / 10 ** Number(usdtDecimal);
   };
 
   const toRawBUSD = async (price) => {
-    const usdtDecimal = await readContract({
-      ...gState['contracts']['busd'].value,
-      functionName: 'decimals',
-    });
+    const usdtDecimal = await ctxContract.busd.decimals();
     return Number(price) * 10 ** Number(usdtDecimal);
   };
 
@@ -115,18 +95,18 @@ const Home: NextPage = () => {
             {address && <div>{address}</div>}
           </div>
 
+          <div className="flex flex-col items-center">
+            <button
+              onClick={getBusdBal}
+              className="py-2 px-6 bg-green-500 text-white rounded-lg hover:bg-green-600 active:scale-95"
+            >
+              GET BUSD BALANCE
+            </button>
+            <div>{`BUSD Balance: ${balance.value.toLocaleString()}`}</div>
+          </div>
+
           {address && (
             <div className="space-y-8 pt-6">
-              <div className="flex flex-col items-center">
-                <button
-                  onClick={getBusdBal}
-                  className="py-2 px-6 bg-green-500 text-white rounded-lg hover:bg-green-600 active:scale-95"
-                >
-                  GET BUSD BALANCE
-                </button>
-                <div>{`BUSD Balance: ${balance.value.toLocaleString()}`}</div>
-              </div>
-
               <div className="flex flex-col items-center gap-2">
                 <input
                   className="border px-4 py-1"

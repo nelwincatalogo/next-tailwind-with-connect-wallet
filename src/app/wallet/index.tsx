@@ -12,9 +12,9 @@ import {
   disconnect,
   watchAccount,
   signMessage,
-  readContract,
   getContract,
   getProvider,
+  fetchSigner,
 } from '@wagmi/core';
 
 import axios, { BLOCKCHAIN } from '@/app/api';
@@ -111,14 +111,15 @@ export function WalletProvider({ children }) {
   const loadContract = async () => {
     try {
       const provider = getProvider();
+      const signer = await fetchSigner();
 
       const nft = getContract({
         ...gState.contracts['nft'].value,
-        signerOrProvider: provider,
+        signerOrProvider: signer || provider,
       });
       const busd = getContract({
         ...gState.contracts['busd'].value,
-        signerOrProvider: provider,
+        signerOrProvider: signer || provider,
       });
 
       setCtxContract({

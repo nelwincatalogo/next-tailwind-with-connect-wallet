@@ -34,6 +34,7 @@ const Home: NextPage = () => {
       alert.success('SENT SUCCESS');
     } catch (error) {
       alert.error(error.message);
+      console.error(error.message);
     } finally {
       getBusdBal();
     }

@@ -2,8 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  // trailingSlash: true,
-  // compiler: { // uncomment this to enable console logs remover
+  trailingSlash: true,
+  // compiler: { // uncomment this to enable console logs
   //   removeConsole: {
   //     exclude: ['error'],
   //   },

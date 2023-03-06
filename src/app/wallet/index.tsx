@@ -24,7 +24,7 @@ import { useGlobalState } from '../store';
 
 const { chains, provider, webSocketProvider } = configureChains(
   config.setting.supported_chains,
-  [publicProvider()]
+  config.setting.providers
 );
 
 const client = createClient({

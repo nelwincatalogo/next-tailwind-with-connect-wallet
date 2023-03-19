@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
+  reactStrictMode: false,
+  swcMinify: false,
   trailingSlash: true,
   // compiler: { // uncomment this to enable console logs
   //   removeConsole: {
